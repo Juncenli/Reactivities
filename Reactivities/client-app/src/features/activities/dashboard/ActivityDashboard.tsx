@@ -26,6 +26,7 @@ import ActivityList from './ActivityList';
 
 简单来说，这个 `ActivityDashboard` 组件是一个活动管理的仪表板，它允许用户查看活动列表，查看选中活动的详情，编辑选中的活动，以及删除活动。
 */
+
 interface Props {
     activities: Activity[];
     selectedActivity: Activity | undefined;
@@ -36,10 +37,11 @@ interface Props {
     editMode: boolean;
     createOrEdit: (activity: Activity) => void;
     deleteActivity: (id: string) => void;
+    submitting: boolean;
 }
 
 export default function ActivityDashboard({ activities, selectedActivity, selectActivity,
-    cancelSelectActivity, openForm, closeForm, editMode, createOrEdit, deleteActivity }: Props) {
+    cancelSelectActivity, openForm, closeForm, editMode, createOrEdit, deleteActivity, submitting }: Props) {
     return (
         <Grid>
             <Grid.Column width='10'>
@@ -47,6 +49,7 @@ export default function ActivityDashboard({ activities, selectedActivity, select
                     activities={activities} 
                     selectActivity={selectActivity}
                     deleteActivity={deleteActivity} 
+                    submitting={submitting}
                 />
             </Grid.Column>
             <Grid.Column width='6'>
@@ -60,7 +63,9 @@ export default function ActivityDashboard({ activities, selectedActivity, select
                     <ActivityForm 
                         closeForm={closeForm} 
                         activity={selectedActivity} 
-                        createOrEdit={createOrEdit} />}
+                        createOrEdit={createOrEdit} 
+                        submitting={submitting}
+                    />}
             </Grid.Column>
 
         </Grid>

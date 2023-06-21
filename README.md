@@ -375,3 +375,116 @@ Remember that while the CQRS pattern can be useful, it may not be suitable for e
 ![CQRS](README-pics/CRQS2.png)
 
 ![CQRS](README-pics/CRQS3.png)
+
+
+# Creating a CRUD application in React
+
+## Using a GUID for the activity id
+
+A GUID (Globally Unique Identifier) is a unique reference number used as an identifier in computer systems. GUIDs are usually stored as 128-bit values and are commonly displayed as 32 hexadecimal digits with groups separated by hyphens, for example:
+
+```
+3F2504E0-4F89-11D3-9A0C-0305E82C3301
+```
+
+GUIDs are designed to be globally unique. Even if you generate them on different machines with no communication between those machines, you can be confident that the GUIDs you generate will not collide.
+
+In the context of your `Activity` data model, using a GUID for the `id` of each activity is a common practice and offers several benefits:
+
+1. **Uniqueness:** The id of each activity will be globally unique. This helps ensure that each activity can be uniquely identified, even across different systems or databases.
+
+2. **Decoupling:** The GUID doesn't contain any semantic information about the activity it identifies. This can help decouple the identification of an activity from the specifics of that activity.
+
+3. **Safety in distribution:** If your application needs to distribute data across different systems, you can safely create new activities in any system without needing to coordinate with a central authority to create a new id.
+
+4. **Merge and sync:** If you have data in different databases, you can merge and sync data without ID conflict.
+
+Remember, while GUIDs have several benefits, they are also larger than other types of identifiers, like integers. This means they take up more storage space and take longer to compare and sort. Depending on the specifics of your application, this might have performance implications that you need to consider.
+
+# Axios
+
+In the App.tsx, we will use the agent component to handle the Http request using Axios.
+
+```tsx
+  const [activities, setActivities] = useState<Activity[]>([]);
+
+  useEffect(() => {
+    agent.Activities.list()
+      .then(response => {
+        let activities: Activity[] = [];
+        response.forEach(activity => {
+          activity.date = activity.date.split('T')[0];
+          activities.push(activity);
+        })
+        setActivities(activities);
+        setLoading(false);
+      })
+  }, [])
+```
+
+```ts
+// This is going to contain all of our requests that go to our API
+
+import axios, { AxiosResponse } from 'axios';
+import { Activity } from '../models/activity';
+
+const sleep = (delay: number) => {
+    return new Promise((resolve) => {
+        setTimeout(resolve, delay);
+    })
+}
+
+axios.defaults.baseURL = 'http://localhost:5000/api';
+
+const responseBody = <T>(response: AxiosResponse<T>) => response.data;
+
+axios.interceptors.response.use(async response => {
+    try {
+        await sleep(1000);
+        return response;
+    } catch (error) {
+        console.log(error);
+        return await Promise.reject(error)
+    }
+})
+
+const requests = {
+    get: <T>(url: string) => axios.get<T>(url).then(responseBody),
+    post: <T>(url: string, body: {}) => axios.post<T>(url, body).then(responseBody),
+    put: <T>(url: string, body: {}) => axios.put<T>(url, body).then(responseBody),
+    del: <T>(url: string) => axios.delete<T>(url).then(responseBody)
+}
+
+const Activities = {
+    list: () => requests.get<Activity[]>(`/activities`),
+    details: (id: string) => requests.get<Activity>(`/activities/${id}`),
+    create: (activity: Activity) => requests.post<void>(`/activities`, activity),
+    update: (activity: Activity) => requests.put<void>(`/activities/${activity.id}`, activity),
+    delete: (id: string) => requests.del<void>(`/activities/${id}`)
+}
+
+const agent = {
+    Activities
+}
+
+export default agent;
+```
+
+This module is a service module that encapsulates axios HTTP requests. Its purpose is to interact with the server-side API.
+
+Firstly, you defined a function named `sleep`, which returns a Promise that resolves after a given delay (in milliseconds). This can be used to simulate network latency.
+
+Then, you set a default base URL for axios, which is used for all HTTP requests.
+
+Next, you created a `responseBody` function, which extracts the data from the axios response.
+
+You also added an interceptor for axios responses, which pauses for 1 second (simulating network latency) after each request returns, then returns the response.
+
+You created a general `requests` object for HTTP GET, POST, PUT, DELETE requests, which encapsulates the various methods of axios for reusing in subsequent code.
+
+In the `Activities` object, you created five functions, which are used to get the list of activities, get the details of a single activity, create a new activity, update an existing activity, and delete an activity, respectively. These functions use the methods in the `requests` object created earlier and send requests to the corresponding API endpoints.
+
+Finally, you created an `agent` object, which includes the `Activities` object, and exported this `agent` object for using these functions in other parts of the application.
+
+The main benefit of this pattern is that it centralizes all the HTTP request logic in one place, making the code clearer and easier to maintain. Meanwhile, it provides a unified way to handle network latency and error handling.
+
