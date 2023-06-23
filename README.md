@@ -79,22 +79,21 @@ Arrows can be used to denote the interaction between the layers:
 
 
 
-与.NET项目结构相比，Spring Boot（以及更广泛的Java生态系统）通常具有以下结构：
+Compared to .NET project structure, Spring Boot (and the broader Java ecosystem) typically has the following structure:
 
-1. **Model/Domain**：这一层和.NET的Domain层基本对应，包含业务领域内的基本实体或对象。例如，对于一个银行应用，这里可能有Account、User等类。
+1. **Model/Domain**: This layer roughly corresponds to the Domain layer in .NET and contains the basic entities or objects within the business domain. For example, for a banking application, there might be classes like Account, User, etc.
 
-2. **Repository/DAO（Data Access Object）**：这一层对应.NET中的Persistence和部分Infrastructure层。这里包含所有与数据库交互的代码，例如CRUD操作。在Spring中，通常使用Spring Data JPA的Repository接口来简化开发。
+2. **Repository/DAO (Data Access Object)**: This layer corresponds to the Persistence and parts of the Infrastructure layer in .NET. It contains all the code interacting with the database, such as CRUD operations. In Spring, the Repository interface of Spring Data JPA is usually used to simplify development.
 
-3. **Service**：Service层对应.NET的部分Domain和Application层。这里包含主要的业务逻辑，所有的事务管理都在这一层处理。
+3. **Service**: The Service layer corresponds to parts of the Domain and Application layers in .NET. It contains the main business logic, and all transaction management is handled at this layer.
 
-4. **Controller**：Controller层对应.NET的API层。这是接收和处理来自用户的HTTP请求，并调用Service层进行处理，最后返回响应的地方。
+4. **Controller**: The Controller layer corresponds to the API layer in .NET. This is where HTTP requests from users are received and processed, invoking the Service layer for processing and finally returning a response.
 
-5. **DTO (Data Transfer Object)**：DTO不是必需的，但在很多应用中都会用到，尤其是在Web服务中。DTOs用于在Controller和Service层之间，以及Service层和Repository/DAO层之间传输数据。它们对应.NET中的ViewModels或DTOs。
+5. **DTO (Data Transfer Object)**: DTOs are not mandatory but are used in many applications, especially in web services. DTOs are used for data transfer between the Controller and Service layers, and between the Service layer and the Repository/DAO layer. They correspond to ViewModels or DTOs in .NET.
 
-6. **Client-App**：这一部分在Spring Boot应用中不常见，因为Spring Boot主要关注后端服务。然而，在一个完整的应用中，这部分对应.NET的Client-App层，可能包括Web前端（HTML/CSS/JavaScript）、桌面应用、移动应用等，这些应用通过API与后端服务通信。
+6. **Client-App**: This part is not common in Spring Boot applications because Spring Boot primarily focuses on backend services. However, in a complete application, this part corresponds to the Client-App layer in .NET, which may include a web front-end (HTML/CSS/JavaScript), desktop applications, mobile applications, etc. These applications communicate with the backend services through APIs.
 
-以上就是Spring Boot和.NET在架构上的主要差异。需要注意的是，这两种技术在很大程度上是互补的，它们都可以用于构建复杂的企业级应用。你应该根据具体的项目需求和团队技能来选择最适合的技术。
-
+Above are the main architectural differences between Spring Boot and .NET. It's important to note that these two technologies are largely complementary, and both can be used to build complex enterprise-level applications. You should choose the most suitable technology based on the specific project requirements and team skills.
 
 
 
@@ -319,24 +318,23 @@ app.UseCors("CorsPolicy");
 
 ## React.StrictMode
 
-`<React.StrictMode>` 是一个用于帮助开发人员在开发过程中检查潜在问题的React包装组件。这个组件不会对生产环境的构建产生影响，只会在开发模式下运行，帮助你找出应用中的潜在问题。
+`<React.StrictMode>` is a React wrapper component used to help developers identify potential problems during the development process. This component does not affect production builds and only runs in development mode, helping you find potential problems in your application.
 
-它主要进行以下检查：
+It primarily conducts the following checks:
 
-1. **识别过时或不建议使用的生命周期方法：** 如 `componentWillMount`，`componentWillReceiveProps` 和 `componentWillUpdate` 这些在 React 17 之后将会被弃用的生命周期方法。使用了这些方法的组件在严格模式下会在控制台中打印警告。
+1. **Identify obsolete or discouraged lifecycle methods:** Lifecycle methods such as `componentWillMount`, `componentWillReceiveProps`, and `componentWillUpdate`, which will be deprecated after React 17, are flagged. Components using these methods will print warnings in the console under strict mode.
 
-2. **警告使用了不安全的生命周期钩子：** `<React.StrictMode>` 会帮助找出应用中使用了不安全的生命周期钩子的地方。
+2. **Warns about using unsafe lifecycle hooks:** `<React.StrictMode>` helps identify places in your application where unsafe lifecycle hooks are used.
 
-3. **检查意外的副作用：** 严格模式下，生命周期方法以及 `render` 方法会被执行两次（这只会在开发模式下发生，不会影响生产环境）。这有助于开发者捕获到在这些方法中可能出现的意外副作用。
+3. **Checks for unexpected side effects:** Under strict mode, lifecycle methods and `render` methods are executed twice (this only happens in development mode and does not affect the production environment). This helps developers capture unexpected side effects that may occur in these methods.
 
-4. **检查使用过时的 context API：** 新的 Context API 是 React 16.3 版本新添加的，如果你的项目中还在使用过时的 context API，`<React.StrictMode>` 会在控制台中打印警告。
+4. **Checks the use of outdated context API:** The new Context API was added in React 16.3. If your project is still using the outdated context API, `<React.StrictMode>` will print warnings in the console.
 
-5. **检测是否有使用废弃的ref API：** 早期的版本中，字符串（legacy string ref）被用作 ref ，现在已经被回调函数和 `createRef` API 取代。如果你的应用中仍然使用了字符串 ref ，`<React.StrictMode>` 会在控制台打印警告。
+5. **Detects whether the deprecated ref API is used:** In earlier versions, strings (legacy string ref) were used as refs, which have now been replaced by callback functions and the `createRef` API. If your application still uses string refs, `<React.StrictMode>` will print warnings in the console.
 
-6. **检查是否在组件中误用了 DOM 属性：** 例如，某些无效的属性值被传递给了 DOM 的元素。
+6. **Checks for misuse of DOM attributes in components:** For example, some invalid attribute values are passed to DOM elements.
 
-这些检查有助于发现和修正开发过程中可能犯的错误，让应用的代码质量更高、更易于维护。
-
+These checks help to discover and correct possible mistakes made during the development process, making the application code higher in quality and easier to maintain.
 
 ## Semantic UI
 
@@ -487,4 +485,104 @@ In the `Activities` object, you created five functions, which are used to get th
 Finally, you created an `agent` object, which includes the `Activities` object, and exported this `agent` object for using these functions in other parts of the application.
 
 The main benefit of this pattern is that it centralizes all the HTTP request logic in one place, making the code clearer and easier to maintain. Meanwhile, it provides a unified way to handle network latency and error handling.
+
+## Axios Interceptor
+
+An axios interceptor allows you to run your code or modify the request and/or response before the request is sent or before the promise is fulfilled. 
+
+There are two types of interceptors in axios:
+
+1. **Request Interceptor:** This type of interceptor can be used to modify requests before they are sent to the server. This is useful for a variety of things such as setting custom headers, adding authentication tokens, or logging.
+
+2. **Response Interceptor:** This type of interceptor allows you to handle responses before they are processed by `then` or `catch`. You can use them to modify the responses, handle errors globally, etc.
+
+In your case, you have used a response interceptor which waits for 1 second before returning the response to simulate network latency:
+
+```javascript
+axios.interceptors.response.use(async response => {
+    try {
+        await sleep(1000);
+        return response;
+    } catch (error) {
+        console.log(error);
+        return await Promise.reject(error)
+    }
+})
+```
+
+In the code snippet above:
+
+- `axios.interceptors.response.use` method is used to define a response interceptor.
+- It takes a function as an argument, which itself takes `response` as an argument.
+- Inside this function, a delay of 1 second is introduced using the `sleep` function.
+- After the delay, it returns the response as it is. If there is an error, it logs the error and rejects the promise.
+
+Remember, if a response interceptor returns an error, axios will reject the request promise. To handle errors effectively, you can catch them at the request level.
+
+# MobX
+
+MobX is a simple, scalable state management library for JavaScript applications. Based on the principles of Functional Reactive Programming (FRP), it allows you to directly and intuitively connect observable state and functions that respond to state changes.
+
+The core idea of MobX is that any source of application state should automatically flow to functions, computed properties, or reactions that depend on it. In other words, using MobX, you can easily create data models in JavaScript, create views, and bind them together. When the data model changes, it automatically updates the view.
+
+Key concepts include:
+
+- **Observables**: This is the state you want to track its changes. It can be any type of value, including basic types (such as numbers and strings), reference types (such as objects and arrays), and custom types.
+
+- **Actions**: These are anything that will change your state. In MobX, actions are functions that change observables.
+
+- **Computed Values**: These are automatically derived from the values of observables. They can be used to perform operations with side effects (such as printing to the console), create derived information (such as the total price in the shopping cart), and so on.
+
+- **Reactions**: These are side effects that occur automatically when observables change. Typically, you will use reactions to handle UI updates or interactions with external data sources.
+
+MobX provides a concise and powerful way to handle state in complex UIs (for example, in React or Vue). It is more intuitive to use than other state management libraries (such as Redux), requires less boilerplate code, and because it uses a method based on mutable state, it may be easier to understand in some cases.
+
+For example, imagine you are developing a React application where there is a shopping cart component that needs to display the total number of items in the cart. If you are not using MobX, you might have to do this:
+
+```tsx
+class ShoppingCart extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { items: [] };
+    }
+
+    addItem(item) {
+        this.setState(prevState => ({ items: [...prevState.items, item] }));
+    }
+
+    render() {
+        return <div>Cart Items: {this.state.items.length}</div>;
+    }
+}
+```
+
+Every time the `addItem` method is called, we need to use `setState` to update the state. This will trigger a re-render, displaying the new quantity of items in the shopping cart. This is manual, and if you have many places that need to update or depend on the quantity of items in the shopping cart, you need to ensure that `setState` is called correctly in all places.
+
+Now, let's see how this process is simplified if we use MobX:
+
+```tsx
+import { observable, action } from 'mobx';
+import { observer } from 'mobx-react';
+
+class ShoppingCart {
+    @observable items = [];
+
+    @action
+    addItem(item) {
+        this.items.push(item);
+    }
+}
+
+@observer
+class ShoppingCartComponent extends React.Component {
+    render() {
+        return <div>Cart Items: {this.props.store.items.length}</div>;
+    }
+}
+```
+
+In this example, the array of items in the shopping cart is marked as `observable`, and when you add an item to the cart, all you need to do is call the `addItem` method. Because `ShoppingCartComponent` is an `observer`, it automatically responds to changes in `observable` and re-renders to display the new quantity of items.
+
+This is a simple example, but as your application state and logic become more complex, using MobX can significantly simplify your code and make state management more intuitive and predictable.
+
 
