@@ -1,7 +1,3 @@
-using Domain;
-using MediatR;
-using Persistence;
-
 /*
     This code defines a `Create` command and its handler in the context of the MediatR library. Here's a more detailed breakdown:
 
@@ -21,16 +17,22 @@ using Persistence;
 
     In summary, this code handles a "create activity" request. It adds a new `Activity` to the database. This is part of the Command portion in CQRS (i.e., the write operation).
 */
+using Application.Core;
+using Domain;
+using FluentValidation;
+using MediatR;
+using Persistence;
+
 namespace Application.Activities
 {
     public class Create
     {
-        public class Command : IRequest
+        public class Command : IRequest<Result<Unit>>
         {
             public Activity Activity { get; set; }
         }
 
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<Command, Result<Unit>>
         {
             private readonly DataContext _context;
 
@@ -39,13 +41,23 @@ namespace Application.Activities
                 _context = context;
             }
 
-            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public class CommandValidator : AbstractValidator<Command>
+            {
+                public CommandValidator()
+                {
+                    RuleFor(x => x.Activity).SetValidator(new ActivityValidator());
+                }
+            }
+
+            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
                 _context.Activities.Add(request.Activity);
 
-                await _context.SaveChangesAsync();
+                var result = await _context.SaveChangesAsync() > 0;
 
-                return Unit.Value;
+                if (!result) return Result<Unit>.Failure("Failed to create activity");
+
+                return Result<Unit>.Success(Unit.Value);
             }
         }
     }

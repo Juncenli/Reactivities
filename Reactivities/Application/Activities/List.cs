@@ -1,9 +1,3 @@
-using Domain;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Persistence;
-
 /*
     这个代码片段是一个 ASP.NET Core 使用 MediatR 库实现的 CQRS（Command Query Responsibility Segregation）模式的例子。在这个模式中，我们把数据的读和写操作分离成两个独立的模型，使得系统的复杂性降低。
 
@@ -19,13 +13,19 @@ using Persistence;
 
 */
 
+using Application.Core;
+using Domain;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Persistence;
+
 namespace Application.Activities
 {
     public class List
     {
-        public class Query : IRequest<List<Activity>> { }
+        public class Query : IRequest<Result<List<Activity>>> { }
 
-        public class Handler : IRequestHandler<Query, List<Activity>>
+        public class Handler : IRequestHandler<Query, Result<List<Activity>>>
         {
             private readonly DataContext _context;
 
@@ -34,11 +34,10 @@ namespace Application.Activities
                 _context = context;
             }
 
-            public async Task<List<Activity>> Handle(Query request, CancellationToken token)
+            public async Task<Result<List<Activity>>> Handle(Query request, CancellationToken cancellationToken)
             {
-                return await _context.Activities.ToListAsync();
+                return Result<List<Activity>>.Success(await _context.Activities.ToListAsync());
             }
         }
     }
 }
-

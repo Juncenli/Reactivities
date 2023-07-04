@@ -1,8 +1,3 @@
-using AutoMapper;
-using Domain;
-using MediatR;
-using Persistence;
-
 /*
     这段代码定义了一个“编辑活动”的命令和处理器，使用了MediatR库以及AutoMapper库。我来详细解释下：
 
@@ -20,16 +15,31 @@ using Persistence;
 
     总的来说，这段代码是在处理一个“编辑活动”的请求，它首先从数据库中找到要编辑的活动，然后把新的活动数据映射到找到的活动上，最后保存到数据库。这就是CQRS中的Command部分（即写操作）。
 */
+using Application.Core;
+using AutoMapper;
+using Domain;
+using FluentValidation;
+using MediatR;
+using Persistence;
+
 namespace Application.Activities
 {
     public class Edit
     {
-        public class Command : IRequest
+        public class Command : IRequest<Result<Unit>>
         {
             public Activity Activity { get; set; }
         }
 
-        public class Handler : IRequestHandler<Command>
+        public class CommandValidator : AbstractValidator<Command>
+        {
+            public CommandValidator()
+            {
+                RuleFor(x => x.Activity).SetValidator(new ActivityValidator());
+            }
+        }
+
+        public class Handler : IRequestHandler<Command, Result<Unit>>
         {
             private readonly DataContext _context;
             private readonly IMapper _mapper;
@@ -40,15 +50,19 @@ namespace Application.Activities
                 _context = context;
             }
 
-            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var activity = await _context.Activities.FindAsync(request.Activity.Id);
 
+                if (activity == null) return null;
+
                 _mapper.Map(request.Activity, activity);
 
-                await _context.SaveChangesAsync();
+                var result = await _context.SaveChangesAsync() > 0;
 
-                return Unit.Value;
+                if (!result) return Result<Unit>.Failure("Failed to update activity");
+
+                return Result<Unit>.Success(Unit.Value);
             }
         }
     }
