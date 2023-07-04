@@ -1,3 +1,8 @@
+
+
+# Intro
+
+
 - .NET Core is a cross-platform, `open-source framework` developed by Microsoft that can be used to develop a variety of application types, including web applications (`using ASP.NET Core`), desktop applications, cloud services, and more. Advantages of developing with .NET Core include good performance, cross-platform capabilities (it can run on Windows, Linux, and MacOS), and rich library support.
 
 - Node.js is an open-source, cross-platform `JavaScript runtime environment based on Chrome's V8 JavaScript engine`. It allows JavaScript to be run outside the browser on the server side. Node.js has an extremely rich package manager, npm, and a vibrant community with a large number of open-source libraries available for use.
@@ -586,3 +591,34 @@ In this example, the array of items in the shopping cart is marked as `observabl
 This is a simple example, but as your application state and logic become more complex, using MobX can significantly simplify your code and make state management more intuitive and predictable.
 
 
+# Error Handling
+
+In the HTTP protocol, an error response is represented by a status code and potentially a response body. HTTP error status codes usually start with 4xx or 5xx, representing client-side and server-side errors respectively.
+
+Here are some common HTTP error status codes:
+
+- 400 Bad Request: The server could not understand the request due to invalid syntax.
+- 401 Unauthorized: The request requires user authentication.
+- 403 Forbidden: The server understood the request, but refuses to authorize it.
+- 404 Not Found: The server can't find the requested resource.
+- 500 Internal Server Error: The server encountered an unexpected condition which prevented it from fulfilling the request.
+
+When you encounter an HTTP error response during development, you should first check the status code of the response to understand the nature of the error. Then, you can look at the error message in the response body, which usually provides more detailed information about the error. For example, if you're using the `fetch` API or `axios` library in JavaScript to make requests, you could handle error responses like this:
+
+```javascript
+fetch('https://api.example.com/data')
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    // handle the data...
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+```
+
+In this example, if the HTTP response's status code is not in the 2xx range (which represents successful responses), an error is thrown and the details of the error are logged to the console.

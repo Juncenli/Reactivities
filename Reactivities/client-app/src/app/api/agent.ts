@@ -1,7 +1,32 @@
 // This is going to contain all of our requests that go to our API
 
-import axios, { AxiosResponse } from 'axios';
+// 这个模块是一个封装了axios HTTP请求的服务模块，其目的是对服务端的API进行交互。
+
+// 首先，你定义了一个名为`sleep`的函数，该函数返回一个Promise，会在给定的延迟（以毫秒为单位）后被解析。这可以用来模拟网络延迟。
+
+// 然后，你为axios设置了一个默认的基本URL，该URL用于所有的HTTP请求。
+
+// 接下来，你创建了一个`responseBody`函数，该函数从axios的响应中提取出数据。
+
+// 你还为axios的响应添加了一个拦截器，该拦截器在每个请求返回后暂停1秒（模拟网络延迟），然后返回响应。
+
+// 你为HTTP GET, POST, PUT, DELETE请求创建了一个通用的`requests`对象，这个对象对axios的各个方法进行了封装，以便于在后续的代码中重复使用。
+
+// 在`Activities`对象中，你创建了五个函数，分别用于获取活动列表、获取单个活动详情、创建新的活动、更新现有的活动和删除活动。这些函数都使用了前面创建的`requests`对象中的方法，并向对应的API endpoint发送请求。
+
+// 最后，你创建了一个`agent`对象，包含了`Activities`对象，并将这个`agent`对象导出，以便在应用的其他部分使用这些函数。
+
+// 这种模式的主要好处是，它将所有的HTTP请求逻辑集中在一个地方，使得代码更加清晰，易于维护。同时，它提供了一种统一的方式来处理网络延迟和错误处理。
+
+
+
+
+
+import axios, { AxiosError, AxiosResponse } from 'axios';
+import { toast } from 'react-toastify';
 import { Activity } from '../models/activity';
+import { router } from '../router/Routes';
+import { store } from '../stores/store';
 
 const sleep = (delay: number) => {
     return new Promise((resolve) => {
@@ -14,13 +39,42 @@ axios.defaults.baseURL = 'http://localhost:5000/api';
 const responseBody = <T>(response: AxiosResponse<T>) => response.data;
 
 axios.interceptors.response.use(async response => {
-    try {
-        await sleep(1000);
-        return response;
-    } catch (error) {
-        console.log(error);
-        return await Promise.reject(error)
+    await sleep(1000);
+    return response;
+}, (error: AxiosError) => {
+    const {data, status, config} = error.response as AxiosResponse;
+    switch (status) {
+        case 400:
+            if (config.method === 'get' && data.errors.hasOwnProperty('id')) {
+                router.navigate('/not-found');
+            }
+            if (data.errors) {
+                const modalStateErrors = [];
+                for (const key in data.errors) {
+                    if (data.errors[key]) {
+                        modalStateErrors.push(data.errors[key])
+                    }
+                }
+                throw modalStateErrors.flat();
+            } else {
+                toast.error(data);
+            }
+            break;
+        case 401: 
+            toast.error('unauthorised')
+            break;
+        case 403:
+            toast.error('forbidden')
+            break;
+        case 404:
+            router.navigate('/not-found');
+            break;
+        case 500:
+            store.commonStore.setServerError(data);
+            router.navigate('/server-error');
+            break;
     }
+    return Promise.reject(error);
 })
 
 const requests = {
@@ -43,22 +97,3 @@ const agent = {
 }
 
 export default agent;
-
-
-// 这个模块是一个封装了axios HTTP请求的服务模块，其目的是对服务端的API进行交互。
-
-// 首先，你定义了一个名为`sleep`的函数，该函数返回一个Promise，会在给定的延迟（以毫秒为单位）后被解析。这可以用来模拟网络延迟。
-
-// 然后，你为axios设置了一个默认的基本URL，该URL用于所有的HTTP请求。
-
-// 接下来，你创建了一个`responseBody`函数，该函数从axios的响应中提取出数据。
-
-// 你还为axios的响应添加了一个拦截器，该拦截器在每个请求返回后暂停1秒（模拟网络延迟），然后返回响应。
-
-// 你为HTTP GET, POST, PUT, DELETE请求创建了一个通用的`requests`对象，这个对象对axios的各个方法进行了封装，以便于在后续的代码中重复使用。
-
-// 在`Activities`对象中，你创建了五个函数，分别用于获取活动列表、获取单个活动详情、创建新的活动、更新现有的活动和删除活动。这些函数都使用了前面创建的`requests`对象中的方法，并向对应的API endpoint发送请求。
-
-// 最后，你创建了一个`agent`对象，包含了`Activities`对象，并将这个`agent`对象导出，以便在应用的其他部分使用这些函数。
-
-// 这种模式的主要好处是，它将所有的HTTP请求逻辑集中在一个地方，使得代码更加清晰，易于维护。同时，它提供了一种统一的方式来处理网络延迟和错误处理。
