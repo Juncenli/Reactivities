@@ -1,5 +1,4 @@
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
+
 
 /*
     这段代码定义了一个叫做 `BaseApiController` 的类，该类继承自 `ControllerBase` 类，`ControllerBase` 是 ASP.NET Core MVC 中用于创建 Web API 控制器的基类。以下是详细的解释：
@@ -13,6 +12,10 @@ using Microsoft.AspNetCore.Mvc;
     总的来说，`BaseApiController` 是一个基础控制器类，你可以在你的应用程序中创建的其他控制器继承这个基础控制器，以复用一些常用的功能或设定，例如这里的 `Mediator` 属性。
 */
 
+using Application.Core;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+
 namespace API.Controllers
 {
     [ApiController]
@@ -23,6 +26,18 @@ namespace API.Controllers
 
         protected IMediator Mediator => _mediator ??= 
             HttpContext.RequestServices.GetService<IMediator>();
+
+        protected ActionResult HandleResult<T>(Result<T> result)
+        {
+            if (result == null) return NotFound();
+
+            if (result.IsSuccess && result.Value != null)
+                return Ok(result.Value);
+
+            if (result.IsSuccess && result.Value == null)
+                return NotFound();
+
+            return BadRequest(result.Error);
+        }
     }
 }
-
