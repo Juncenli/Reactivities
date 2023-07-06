@@ -1,10 +1,3 @@
-using Application.Activities;
-using Domain;
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Persistence;
-
 
 /*
     This code is for an API Controller named `ActivitiesController` in ASP.NET Core. This controller is responsible for handling HTTP requests related to `Activity` objects. Here's a detailed explanation:
@@ -23,6 +16,15 @@ using Persistence;
 
     This controller effectively provides a full CRUD (Create, Read, Update, Delete) interface for `Activity` objects.
 */
+
+
+using Application.Activities;
+using Domain;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Persistence;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
