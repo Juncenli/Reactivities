@@ -1,6 +1,10 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
+<<<<<<< HEAD
 import { Activity, ActivityFormValues } from '../models/activity';
+=======
+import { Activity } from '../models/activity';
+>>>>>>> f6869a454a5da75a169594911d38ff39715a0f07
 import { User, UserFormValues } from '../models/user';
 import { router } from '../router/Routes';
 import { store } from '../stores/store';
@@ -74,6 +78,12 @@ const Activities = {
     update: (activity: ActivityFormValues) => requests.put<void>(`/activities/${activity.id}`, activity),
     delete: (id: string) => requests.del<void>(`/activities/${id}`),
     attend: (id: string) => requests.post<void>(`/activities/${id}/attend`, {})
+}
+
+const Account = {
+    current: () => requests.get<User>('account'),
+    login: (user: UserFormValues) => requests.post<User>('/account/login', user),
+    register: (user: UserFormValues) => requests.post<User>('/account/register', user)
 }
 
 const Account = {
